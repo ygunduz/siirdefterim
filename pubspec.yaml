@@ -18,6 +18,8 @@ dependencies:
 
   sqflite: any
 
+  firebase_messaging: ^3.0.1
+
   share: ^0.5.3
 
   flutter_launcher_icons: ^0.7.0

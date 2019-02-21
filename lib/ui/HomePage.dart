@@ -7,6 +7,7 @@ import 'SairDetailPage.dart';
 import 'SiirDetailPage.dart';
 import 'FavoritesPage.dart';
 import 'AvatarImageButton.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -17,6 +18,38 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _SearchViewDelegate _delegate = _SearchViewDelegate();
   DatabaseHelper _db = DatabaseHelper();
+
+  FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+
+  @override
+  void initState() {
+    super.initState();
+    firebaseCloudMessaging_Listeners();
+  }
+
+  void firebaseCloudMessaging_Listeners() {
+    _firebaseMessaging.getToken().then((token){
+      print(token);
+    });
+
+    _firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async{
+        _scaffoldKey.currentState.showSnackBar(new SnackBar(
+            content: new Text('on Message $message')
+        ));
+      },
+      onResume: (Map<String, dynamic> message) async{
+        _scaffoldKey.currentState.showSnackBar(new SnackBar(
+            content: new Text('on Resume $message')
+        ));
+      },
+      onLaunch: (Map<String, dynamic> message) async{
+        _scaffoldKey.currentState.showSnackBar(new SnackBar(
+            content: new Text('on Launch $message')
+        ));
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
