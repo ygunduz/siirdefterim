@@ -44,7 +44,7 @@ class _StateWidgetState extends State<StateWidget> {
     if (widget.state != null) {
       state = widget.state;
     } else {
-      state = new StateModel(isLoading: true);
+      state = new StateModel(isLoading: true , isLoggedIn: false);
 
       initUser();
     }
@@ -73,7 +73,7 @@ class _StateWidgetState extends State<StateWidget> {
 
     setState(() {
       state.isLoading = false;
-
+      state.isLoggedIn = true;
       state.user = firebaseUser;
     });
   }
