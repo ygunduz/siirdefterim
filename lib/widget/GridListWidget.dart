@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../util/DBHelper.dart';
 import '../model/SairModel.dart';
-import 'SairDetailPage.dart';
+import '../ui/SairDetailPage.dart';
 
 typedef BannerTapCallback = void Function(Photo photo);
 
