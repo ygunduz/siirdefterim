@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../model/SiirModel.dart';
 import '../model/SairModel.dart';
-import 'SiirDetailPage.dart';
+import '../ui/SiirDetailPage.dart';
 import 'SiirCard.dart';
 import '../util/DBHelper.dart';
 

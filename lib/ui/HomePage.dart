@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import 'GridListWidget.dart';
+import '../widget/GridListWidget.dart';
 import '../util/DBHelper.dart';
 import '../model/SiirModel.dart';
 import '../model/SairModel.dart';
 import 'SairDetailPage.dart';
 import 'SiirDetailPage.dart';
 import 'FavoritesPage.dart';
-import 'AvatarImageButton.dart';
+import '../widget/AvatarImageButton.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import '../model/State.dart';
+import '../StateWidget.dart';
+import 'LoginPage.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -18,6 +21,7 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _SearchViewDelegate _delegate = _SearchViewDelegate();
   DatabaseHelper _db = DatabaseHelper();
+  StateModel appState;
 
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
@@ -55,7 +59,21 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: AppBar(title: Text('Şiir Defterim')),
+      appBar: AppBar(
+        title: Text('Şiir Defterim'),
+        actions: <Widget>[
+          IconButton(
+              icon: Icon(Icons.person) ,
+              onPressed: (){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => LoginPage()),
+                );
+              }
+          )
+        ],
+      ),
       body: GridListWidget(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(

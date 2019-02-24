@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import '../util/DBHelper.dart';
 import '../model/SairModel.dart';
 import '../model/SiirModel.dart';
-import 'SairDetailPage.dart';
-import 'SiirDetailPage.dart';
+import '../ui/SairDetailPage.dart';
+import '../ui/SiirDetailPage.dart';
 import 'AvatarImageButton.dart';
 
 class FavoritesList extends StatelessWidget {

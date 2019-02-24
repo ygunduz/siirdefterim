@@ -4,7 +4,7 @@ import '../model/SairModel.dart';
 import '../util/DBHelper.dart';
 import '../model/ReadingTheme.dart';
 import 'package:share/share.dart';
-import 'CustomButton.dart';
+import '../widget/CustomButton.dart';
 
 class SiirDetailPage extends StatefulWidget {
   SiirModel siir;

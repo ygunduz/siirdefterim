@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../model/SairModel.dart';
-import 'SairBioWidget.dart';
-import 'SiirList.dart';
+import '../widget/SairBioWidget.dart';
+import '../widget/SiirList.dart';
 
 class SairDetailPage extends StatefulWidget {
   SairDetailPage({Key key, @required this.sair}) : super(key: key);
