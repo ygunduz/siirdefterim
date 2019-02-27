@@ -36,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
             minWidth: size.width - 10,
             child: GoogleSignInButton(
               // Passing function callback as constructor argument:
-              onPressed: () => StateWidget.of(context).signInWithGoogle()
+              onPressed: () async => StateWidget.of(context).signInWithGoogle()
             )
           )
         ],
@@ -52,9 +52,7 @@ class _LoginPageState extends State<LoginPage> {
             minWidth: size.width - 10,
             textTheme: ButtonTextTheme.primary,
             child: RaisedButton(
-                onPressed: (){
-                  print('logout');
-                } ,
+                onPressed: () async => StateWidget.of(context).signOutFromGoogle(),
                 child: Text('Çıkış Yap')
             )
           )

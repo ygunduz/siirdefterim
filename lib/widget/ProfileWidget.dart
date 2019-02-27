@@ -14,7 +14,7 @@ class ProfileWidget extends StatelessWidget {
     return Container(
       width: size.width - 10,
       height: 80,
-      color: Colors.black12,
+      color: Colors.grey[200],
       padding: EdgeInsets.all(10),
       margin: EdgeInsets.only(top: 10),
       child: Row(
