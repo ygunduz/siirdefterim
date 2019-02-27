@@ -283,4 +283,25 @@ class DatabaseHelper {
     var dbClient = await db;
     return dbClient.close();
   }
+
+  Future<int> updateFavorites(List<String> lstFavorites) async {
+    var dbClient = await db;
+    String inString = lstFavorites.toString().replaceAll('[', '(').replaceAll(']', ')');
+
+    return await dbClient.rawUpdate('update $tableSiirler set $columnIsFavorite = ' +
+        ' 1 where $columnId in $inString'
+    );
+  }
+
+  Future<int> getIsFirstLogin() async {
+    var dbClient = await db;
+    return Sqflite.firstIntValue(
+        await dbClient.rawQuery('SELECT isFirstLogin FROM $tableSettings'));
+  }
+
+  Future<int> setIsFirstLogin(int value) async{
+    var dbClient = await db;
+
+    return await dbClient.rawUpdate('update $tableSettings set isFirstLogin = $value');
+  }
 }

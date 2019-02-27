@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage> {
         title: Text('Şiir Defterim'),
         actions: <Widget>[
           IconButton(
-              icon: Icon(Icons.person) ,
+              icon: Icon(Icons.more_vert) ,
               onPressed: (){
                 Navigator.push(
                   context,
