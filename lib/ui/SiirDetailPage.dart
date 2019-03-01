@@ -29,6 +29,8 @@ class _SiirDetailPageState extends State<SiirDetailPage> {
   ];
 
   List<Map<String, dynamic>> _siirler = new List();
+  SiirModel _siir;
+  SairModel _sair;
 
   int _currentTheme = 0;
   int _fontSize = 16;
@@ -47,8 +49,8 @@ class _SiirDetailPageState extends State<SiirDetailPage> {
     });
     _currentPage = widget.currentPage;
     _siirler = widget.siirler;
-    widget.siir = SiirModel.fromMap(_siirler[_currentPage]);
-    widget.sair = SairModel.fromMap(_siirler[_currentPage]);
+    _siir = SiirModel.fromMap(_siirler[_currentPage]);
+    _sair = SairModel.fromMap(_siirler[_currentPage]);
     _pageController = new PageController(initialPage: _currentPage);
   }
 
@@ -62,19 +64,19 @@ class _SiirDetailPageState extends State<SiirDetailPage> {
           backgroundColor: themes[_currentTheme].backgroundColor,
           actions: <Widget>[
             IconButton(
-              icon: widget.siir.isFavorite
+              icon: _siir.isFavorite
                   ? Icon(Icons.star, color: themes[_currentTheme].textColor)
                   : Icon(Icons.star_border,
                       color: themes[_currentTheme].textColor),
               onPressed: () {
-                _db.updateFavorite(widget.siir.id).then((result) {
+                _db.updateFavorite(_siir.id).then((result) {
                   if (result > 0) {
                     setState(() {
-                      widget.siir.isFavorite = !widget.siir.isFavorite;
+                      _siir.isFavorite = !_siir.isFavorite;
                       List<Map<String,dynamic>> lst = List();
                       for (int i = 0; i < _siirler.length; i++) {
-                        if (_siirler[i]['id'] == widget.siir.id) {
-                          lst.add(widget.siir.toMap());
+                        if (_siirler[i]['id'] == _siir.id) {
+                          lst.add(_siir.toMap());
                           continue;
                         }
                         lst.add(_siirler[i]);
@@ -88,11 +90,11 @@ class _SiirDetailPageState extends State<SiirDetailPage> {
             IconButton(
                 icon: Icon(Icons.share, color: themes[_currentTheme].textColor),
                 onPressed: () async {
-                  await Share.share(widget.siir.title +
+                  await Share.share(_siir.title +
                       '\n\n' +
-                      widget.siir.content +
+                      _siir.content +
                       '\n\n' +
-                      widget.sair.name);
+                      _sair.name);
                 }),
             IconButton(
                 onPressed: () {
@@ -109,10 +111,10 @@ class _SiirDetailPageState extends State<SiirDetailPage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(widget.siir.title,
+              Text(_siir.title,
                   style: TextStyle(
                       fontSize: 20, color: themes[_currentTheme].textColor)),
-              Text(widget.sair.name,
+              Text(_sair.name,
                   style: TextStyle(
                       fontSize: 14, color: themes[_currentTheme].textColor))
             ],
@@ -123,8 +125,8 @@ class _SiirDetailPageState extends State<SiirDetailPage> {
             onPageChanged: (page) {
               setState(() {
                 _currentPage = page;
-                widget.siir = SiirModel.fromMap(_siirler[page]);
-                widget.sair = SairModel.fromMap(_siirler[page]);
+                _siir = SiirModel.fromMap(_siirler[page]);
+                _sair = SairModel.fromMap(_siirler[page]);
               });
             },
             controller: _pageController,

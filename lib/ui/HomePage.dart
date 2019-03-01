@@ -9,8 +9,8 @@ import 'FavoritesPage.dart';
 import '../widget/AvatarImageButton.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import '../model/State.dart';
-import '../StateWidget.dart';
 import 'LoginPage.dart';
+import 'package:android_intent/android_intent.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -38,21 +38,46 @@ class _HomePageState extends State<HomePage> {
 
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async{
-        _scaffoldKey.currentState.showSnackBar(new SnackBar(
-            content: new Text('on Message $message')
-        ));
+
       },
       onResume: (Map<String, dynamic> message) async{
-        _scaffoldKey.currentState.showSnackBar(new SnackBar(
-            content: new Text('on Resume $message')
-        ));
+        _messageAction(message);
       },
       onLaunch: (Map<String, dynamic> message) async{
-        _scaffoldKey.currentState.showSnackBar(new SnackBar(
-            content: new Text('on Launch $message')
-        ));
+        _messageAction(message);
       },
     );
+  }
+
+  void _messageAction(Map<String, dynamic> message) async{
+    String type = message['data']['type'];
+    if(type.compareTo('poem') == 0){
+      String poemID = message['data']['poem_id'];
+
+      SiirModel siir = await _db.getSiir(int.parse(poemID));
+      SairModel sair = await _db.getSair(siir.sairID);
+      siir.sairID = sair.id;
+      siir.sairName = sair.name;
+      siir.sairSlug = sair.slug;
+
+      List<Map<String, dynamic>> lst = List();
+      lst.add(siir.toMap());
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => SiirDetailPage(siir, sair ,0 , lst )),
+      );
+    }
+    if(type.compareTo('app') == 0){
+      String appID = message['data']['app_id'];
+      String url = 'market://details?id=$appID';
+      AndroidIntent intent = AndroidIntent(
+        action: 'action_view',
+        data: url
+      );
+      await intent.launch();
+    }
   }
 
   @override

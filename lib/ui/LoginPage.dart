@@ -28,18 +28,14 @@ class _LoginPageState extends State<LoginPage> {
     Size size = MediaQuery.of(context).size;
 
     if(!appState.isLoggedIn){
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          ButtonTheme(
-            minWidth: size.width - 10,
-            child: GoogleSignInButton(
-              // Passing function callback as constructor argument:
-              onPressed: () async => StateWidget.of(context).signInWithGoogle()
-            )
+      return Center(
+          child: ButtonTheme(
+              minWidth: size.width - 10,
+              child: GoogleSignInButton(
+                // Passing function callback as constructor argument:
+                  onPressed: () async => StateWidget.of(context).signInWithGoogle()
+              )
           )
-        ],
       );
     }
     else{

@@ -28,6 +28,9 @@ class SiirModel {
   String get sairSlug => _sairSlug;
   set isFavorite(bool isFavorite) => _isFavorite = isFavorite ? 1 : 0;
   set content(String content) => _content = content;
+  set sairID(int val) => _sairID = val;
+  set sairName(String val) => _sairName = val;
+  set sairSlug(String val) => _sairSlug = val;
 
   Map<String, dynamic> toMap() {
     var map = new Map<String, dynamic>();
