@@ -7,10 +7,10 @@ import 'package:share/share.dart';
 import '../widget/CustomButton.dart';
 
 class SiirDetailPage extends StatefulWidget {
-  SiirModel siir;
-  SairModel sair;
-  List<Map<String, dynamic>> siirler;
-  int currentPage;
+  final SiirModel siir;
+  final SairModel sair;
+  final List<Map<String, dynamic>> siirler;
+  final int currentPage;
 
   SiirDetailPage(this.siir, this.sair, this.currentPage, this.siirler);
 

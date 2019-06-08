@@ -13,6 +13,8 @@ class DatabaseHelper {
 
   factory DatabaseHelper() => _instance;
 
+  final int _dbVersion = 2;
+
   final String tableSairler = 'sairler';
   final String columnId = 'id';
   final String columnName = 'name';
@@ -43,14 +45,14 @@ class DatabaseHelper {
 
   initDb() async {
     String databasesPath = await getDatabasesPath();
-    String path = join(databasesPath, 'sairler.db');
+    String path = join(databasesPath, 'sairlerv$_dbVersion.db');
 
     Database db;
     try {
-      db = await openDatabase(path, readOnly: true);
+      db = await openDatabase(path, version: _dbVersion, readOnly: true);
       if(db != null){
         await db.close();
-        db = await openDatabase(path , readOnly: false);
+        db = await openDatabase(path , version: _dbVersion, readOnly: false);
       }
     } catch (e) {
       print("Error $e");
@@ -64,7 +66,7 @@ class DatabaseHelper {
           data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
       await new File(path).writeAsBytes(bytes);
 
-      db = await openDatabase(path, readOnly: false);
+      db = await openDatabase(path,version: _dbVersion , readOnly: false);
     } else {
       print("Opening existing database");
     }
