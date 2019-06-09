@@ -72,7 +72,11 @@ class _SairDetailPageState extends State<SairDetailPage>
                             fontSize: 20.0,
                           )
                       ),
-                      background: Image.asset(_imageName, fit: BoxFit.cover)),
+                      background: Hero(
+                        child: Image.asset(_imageName, fit: BoxFit.cover),
+                        tag: _imageName,
+                      )
+                    )
                 ),
                 SliverPersistentHeader(
                   pinned: true,

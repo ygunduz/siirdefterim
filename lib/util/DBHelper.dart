@@ -29,6 +29,8 @@ class DatabaseHelper {
   final String tableSettings = 'settings';
   final String columnTheme = 'theme';
   final String columnFontSize = 'font_size';
+  final String columnSendDaily = 'send_daily';
+  final String columnShowAds = 'show_ads';
 
   static Database _db;
 
@@ -78,7 +80,9 @@ class DatabaseHelper {
     var result = await dbClient.query(tableSettings,
         columns: [
           columnTheme,
-          columnFontSize
+          columnFontSize,
+          columnShowAds,
+          columnSendDaily,
         ]);
 
     if (result.length > 0) {
@@ -305,5 +309,17 @@ class DatabaseHelper {
     var dbClient = await db;
 
     return await dbClient.rawUpdate('update $tableSettings set isFirstLogin = $value');
+  }
+
+  Future<int> setShowAds(int value) async{
+    var dbClient = await db;
+
+    return await dbClient.rawUpdate('update $tableSettings set $columnShowAds = $value');
+  }
+
+  Future<int> setSendDaily(int value) async{
+    var dbClient = await db;
+
+    return await dbClient.rawUpdate('update $tableSettings set $columnSendDaily = $value');
   }
 }

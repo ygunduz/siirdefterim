@@ -3,6 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:siirdefterim/model/SettingsModel.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import './model/State.dart';
 import './util/Auth.dart';
 import './util/Store.dart';
@@ -49,6 +51,40 @@ class _StateWidgetState extends State<StateWidget> {
       state = new StateModel(isLoading: true , isLoggedIn: false);
 
       initUser();
+      initSettings();
+    }
+  }
+
+  Future<Null> initSettings() async {
+    DatabaseHelper db = DatabaseHelper();
+    SettingsModel settings = await db.getSettings();
+    setState(() {
+      state.sendDaily = settings.sendDaily == 1 ? true : false;
+      state.showAds = settings.showAds == 1 ? true : false;
+    });
+    _subUnsubTopic();
+  }
+
+  Future<Null> changeAdsSettings() async {
+    DatabaseHelper db = DatabaseHelper();
+    int newAdSettings = state.showAds ? 0 : 1;
+    int result = await db.setShowAds(newAdSettings);
+    if(result > 0){
+      setState(() {
+        state.showAds = !state.showAds;
+      });
+    }
+  }
+
+  Future<Null> changeSendDailySettings() async {
+    DatabaseHelper db = DatabaseHelper();
+    int newSendDailySettings = state.sendDaily ? 0 : 1;
+    int result = await db.setSendDaily(newSendDailySettings);
+    if(result > 0){
+      setState(() {
+        state.sendDaily = !state.sendDaily;
+      });
+      _subUnsubTopic();
     }
   }
 
@@ -116,6 +152,17 @@ class _StateWidgetState extends State<StateWidget> {
         List<String> fvList = favorites.map((item) => item['id'].toString()).toList();
         updateFavorites(state.user.uid, fvList);
       });
+    }
+  }
+
+  void _subUnsubTopic(){
+    FirebaseMessaging messaging = FirebaseMessaging();
+    if(state.sendDaily){
+      messaging.subscribeToTopic('daily');
+      print('sub');
+    }else{
+      messaging.unsubscribeFromTopic('daily');
+      print('unsub');
     }
   }
 

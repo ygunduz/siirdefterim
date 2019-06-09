@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> {
 
   void firebaseCloudMessaging_Listeners() {
     _firebaseMessaging.getToken().then((token){
-      print(token);
+      print('Token : $token');
     });
 
     _firebaseMessaging.configure(
