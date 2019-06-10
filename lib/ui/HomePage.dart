@@ -8,7 +8,6 @@ import 'SiirDetailPage.dart';
 import 'FavoritesPage.dart';
 import '../widget/AvatarImageButton.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import '../model/State.dart';
 import 'LoginPage.dart';
 import 'package:android_intent/android_intent.dart';
 
@@ -21,9 +20,13 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _SearchViewDelegate _delegate = _SearchViewDelegate();
   DatabaseHelper _db = DatabaseHelper();
-  StateModel appState;
 
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+
+  @override
+  void dispose(){
+    super.dispose();
+  }
 
   @override
   void initState() {

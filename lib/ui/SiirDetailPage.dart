@@ -1,4 +1,7 @@
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
+import 'package:siirdefterim/StateWidget.dart';
+import 'package:siirdefterim/model/State.dart';
 import '../model/SiirModel.dart';
 import '../model/SairModel.dart';
 import '../util/DBHelper.dart';
@@ -36,6 +39,12 @@ class _SiirDetailPageState extends State<SiirDetailPage> {
   int _fontSize = 16;
   int _currentPage = 0;
 
+  BannerAd _bannerAd = BannerAd(
+      size: AdSize.banner, 
+      //adUnitId: BannerAd.testAdUnitId
+      adUnitId: 'ca-app-pub-2668472791924496/5976151848'
+    );
+
   @override
   void initState() {
     super.initState();
@@ -52,6 +61,12 @@ class _SiirDetailPageState extends State<SiirDetailPage> {
     _siir = SiirModel.fromMap(_siirler[_currentPage]);
     _sair = SairModel.fromMap(_siirler[_currentPage]);
     _pageController = new PageController(initialPage: _currentPage);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _bannerAd.dispose();
   }
 
   @override
@@ -73,7 +88,7 @@ class _SiirDetailPageState extends State<SiirDetailPage> {
                   if (result > 0) {
                     setState(() {
                       _siir.isFavorite = !_siir.isFavorite;
-                      List<Map<String,dynamic>> lst = List();
+                      List<Map<String, dynamic>> lst = List();
                       for (int i = 0; i < _siirler.length; i++) {
                         if (_siirler[i]['id'] == _siir.id) {
                           lst.add(_siir.toMap());
@@ -145,10 +160,33 @@ class _SiirDetailPageState extends State<SiirDetailPage> {
                                   fontSize: _fontSize.toDouble(),
                                   color: themes[_currentTheme].textColor))),
                     ),
-                  )
+                  ),
+                  _buildAds()
                 ],
               );
             }));
+  }
+
+  Widget _buildAds() {
+    StateModel appState = StateWidget.of(context).state;
+    Size size = MediaQuery.of(context).size;
+    if (appState.showAds) {
+      _bannerAd
+        ..load()
+        ..show(
+            anchorOffset: 0,
+            // Banner Position
+            anchorType: AnchorType.bottom);
+      return SizedBox(
+          height: 50,
+          width: size.width,
+          child: Container(
+              height: 50,
+              width: size.width,
+              color: Colors.black12,
+          ));
+    }
+    return SizedBox(height: 0);
   }
 
   void updateTheme(int newTheme) {
@@ -175,8 +213,11 @@ class _SiirDetailPageState extends State<SiirDetailPage> {
   }
 
   Widget _buildSettingsModal() {
+    bool adsEnabled = StateWidget.of(context).state.showAds;
+    double height = adsEnabled ? 250.0 : 200.0;
+
     return Container(
-        height: 200,
+        height: height,
         padding: EdgeInsets.only(top: 10),
         color: Colors.black12,
         child: Column(

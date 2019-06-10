@@ -19,6 +19,9 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@mipmap/ic_notification" />
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-2668472791924496~8940446282" />
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

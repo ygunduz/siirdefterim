@@ -45,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
               Text('Reklam Göster' , style: TextStyle(fontSize: 18)),
               Switch(
                 value: appState.showAds,
-                onChanged: (val) => StateWidget.of(context).changeAdsSettings()
+                onChanged: (val) => _showAdsConfirmDialog(val,context)
               )
             ],
           ),
@@ -54,6 +54,39 @@ class _LoginPageState extends State<LoginPage> {
           _buildBottom(appState)
         ],
       );
+  }
+
+  void _showAdsConfirmDialog(bool val , BuildContext ctx) {
+    if(!val){
+      showDialog(
+        context: ctx,
+        builder: (BuildContext context) {
+          return AlertDialog(
+          title: new Text("Bizi desteklemek istemez misiniz?"),
+          content: new Text("Uygulamamızda reklamlar rahatsızlık vermeyecek düzeydedir." + 
+              "Yine de reklamları kapatmak istiyor musunuz?"),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Hayır"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton(
+              child: new Text("Evet"),
+              onPressed: () {
+                StateWidget.of(ctx).changeAdsSettings();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+          );
+        }
+      );
+    }else{
+      StateWidget.of(ctx).changeAdsSettings();
+    }
   }
 
   Widget _buildBottom(StateModel appState) {
