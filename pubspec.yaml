@@ -7,7 +7,7 @@ description: Şiir Defterim Mobil Uygulaması
 # Both the version and the builder number may be overridden in flutter
 # build by specifying --build-name and --build-number, respectively.
 # Read more about versioning at semver.org.
-version: 1.0.0+1
+version: 1.2.0
 
 environment:
   sdk: ">=2.0.0-dev.68.0 <3.0.0"
@@ -25,6 +25,7 @@ dependencies:
   flutter_launcher_icons: ^0.7.0
   android_intent: ^0.3.0+1
   firebase_admob: ^0.9.0+1
+  synchronized: ^2.1.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

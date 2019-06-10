@@ -7,6 +7,7 @@ import '../model/SettingsModel.dart';
 import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:synchronized/synchronized.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = new DatabaseHelper.internal();
@@ -33,6 +34,7 @@ class DatabaseHelper {
   final String columnShowAds = 'show_ads';
 
   static Database _db;
+  static Lock lock = Lock();
 
   DatabaseHelper.internal();
 
@@ -40,50 +42,50 @@ class DatabaseHelper {
     if (_db != null) {
       return _db;
     }
-    _db = await initDb();
+
+    await lock.synchronized(initDb);
 
     return _db;
   }
 
-  initDb() async {
+  Future<void> initDb() async {
     String databasesPath = await getDatabasesPath();
-    String path = join(databasesPath, 'sairlerv$_dbVersion.db');
+    String path = join(databasesPath, 'database-v$_dbVersion.db');
 
-    Database db;
-    try {
-      db = await openDatabase(path, readOnly: true);
-      if(db != null){
-        await db.close();
-        db = await openDatabase(path, readOnly: false);
+    if (_db == null) {
+      try {
+        _db = await openDatabase(path, readOnly: true);
+        if (_db != null) {
+          await _db.close();
+          _db = await openDatabase(path, readOnly: false);
+        }
+      } catch (e) {
+        print("Error $e");
       }
-    } catch (e) {
-      print("Error $e");
+
+      if (_db == null) {
+        print("Creating new copy from asset");
+
+        ByteData data = await rootBundle.load(join("assets", "database.db"));
+        List<int> bytes =
+            data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+        await new File(path).writeAsBytes(bytes);
+
+        _db = await openDatabase(path, readOnly: false);
+      } else {
+        print("Opening existing database");
+      }
     }
-
-    if (db == null) {
-      print("Creating new copy from asset");
-
-      ByteData data = await rootBundle.load(join("assets", "database.db"));
-      List<int> bytes =
-          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-      await new File(path).writeAsBytes(bytes);
-
-      db = await openDatabase(path , readOnly: false);
-    } else {
-      print("Opening existing database");
-    }
-    return db;
   }
 
-  Future<SettingsModel> getSettings() async{
+  Future<SettingsModel> getSettings() async {
     var dbClient = await db;
-    var result = await dbClient.query(tableSettings,
-        columns: [
-          columnTheme,
-          columnFontSize,
-          columnShowAds,
-          columnSendDaily,
-        ]);
+    var result = await dbClient.query(tableSettings, columns: [
+      columnTheme,
+      columnFontSize,
+      columnShowAds,
+      columnSendDaily,
+    ]);
 
     if (result.length > 0) {
       return new SettingsModel.fromMap(result.first);
@@ -94,18 +96,14 @@ class DatabaseHelper {
 
   Future<int> updateTheme(int theme) async {
     var dbClient = await db;
-    return await dbClient.rawUpdate(
-      ' update $tableSettings set $columnTheme = ? ',
-      [theme]
-    );
+    return await dbClient
+        .rawUpdate(' update $tableSettings set $columnTheme = ? ', [theme]);
   }
 
   Future<int> updateFontSize(int fontSize) async {
     var dbClient = await db;
     return await dbClient.rawUpdate(
-      'update $tableSettings set $columnFontSize = ? ',
-      [fontSize]
-    );
+        'update $tableSettings set $columnFontSize = ? ', [fontSize]);
   }
 
   Future<int> saveSair(SairModel sair) async {
@@ -127,7 +125,7 @@ class DatabaseHelper {
   Future<SairModel> getSairBySlug(String slug) async {
     var dbClient = await db;
     List<Map> result = await dbClient.query(tableSairler,
-        columns: [columnId, columnName, columnSlug, columnBio , columnSiirCount],
+        columns: [columnId, columnName, columnSlug, columnBio, columnSiirCount],
         where: '$columnSlug = ?',
         whereArgs: [slug]);
 
@@ -141,14 +139,16 @@ class DatabaseHelper {
   Future<List> search(String query) async {
     var dbClient = await db;
     String whereArg = '%$query%';
-    var resultSiirler = await dbClient.rawQuery('select siirler.id , $columnIsFavorite, $columnTitle , $columnSairID , $columnContent , $columnName , $columnSlug ' +
-        ' from siirler ' +
-        'left join sairler on sairler.id = siirler.sair_id ' +
-        "where (title like upper('$whereArg')) or (title like lower('$whereArg')) ");
+    var resultSiirler = await dbClient.rawQuery(
+        'select siirler.id , $columnIsFavorite, $columnTitle , $columnSairID , $columnContent , $columnName , $columnSlug ' +
+            ' from siirler ' +
+            'left join sairler on sairler.id = siirler.sair_id ' +
+            "where (title like upper('$whereArg')) or (title like lower('$whereArg')) ");
 
     var resultSairler = await dbClient.query(tableSairler,
-        columns: [columnId, columnSlug, columnName , columnBio],
-        where: "($columnName like upper('$whereArg')) or ($columnName like lower('$whereArg')) ");
+        columns: [columnId, columnSlug, columnName, columnBio],
+        where:
+            "($columnName like upper('$whereArg')) or ($columnName like lower('$whereArg')) ");
 
     List result = [resultSairler.toList(), resultSiirler.toList()];
     return result;
@@ -156,23 +156,25 @@ class DatabaseHelper {
 
   Future<List> getFavorites() async {
     var dbClient = await db;
-    var result = await dbClient.rawQuery('select siirler.id , $columnIsFavorite, $columnTitle , $columnSairID , $columnContent , $columnName , $columnSlug ' +
-        ' from siirler ' +
-        'left join sairler on sairler.id = siirler.sair_id ' +
-        'where is_favorite = ?' , [1]);
+    var result = await dbClient.rawQuery(
+        'select siirler.id , $columnIsFavorite, $columnTitle , $columnSairID , $columnContent , $columnName , $columnSlug ' +
+            ' from siirler ' +
+            'left join sairler on sairler.id = siirler.sair_id ' +
+            'where is_favorite = ?',
+        [1]);
 
     return result;
   }
 
   Future<List> getRandom(int random) async {
     var dbClient = await db;
-    var sql = " select "+
-              " siirler.id , is_favorite, title , sair_id , content , name , slug "+
-              " from siirler left join sairler "+
-              " on sairler.id = siirler.sair_id "+
-              " order by random() limit ? ";
-              
-    var result = await dbClient.rawQuery(sql , [random]);
+    var sql = " select " +
+        " siirler.id , is_favorite, title , sair_id , content , name , slug " +
+        " from siirler left join sairler " +
+        " on sairler.id = siirler.sair_id " +
+        " order by random() limit ? ";
+
+    var result = await dbClient.rawQuery(sql, [random]);
 
     return result;
   }
@@ -192,20 +194,22 @@ class DatabaseHelper {
 
   Future<List> getAllSiirlerBySairID(int sairID) async {
     var dbClient = await db;
-    var result = await dbClient.rawQuery('select siirler.id , $columnIsFavorite, $columnTitle , $columnSairID , $columnContent , $columnName , $columnSlug ' +
-        ' from siirler ' +
-        'left join sairler on sairler.id = siirler.sair_id ' +
-        'where sair_id = ? order by $columnTitle' , [sairID]);
+    var result = await dbClient.rawQuery(
+        'select siirler.id , $columnIsFavorite, $columnTitle , $columnSairID , $columnContent , $columnName , $columnSlug ' +
+            ' from siirler ' +
+            'left join sairler on sairler.id = siirler.sair_id ' +
+            'where sair_id = ? order by $columnTitle',
+        [sairID]);
 
     return result;
   }
 
-  String getIDSString(List<int> ids){
+  String getIDSString(List<int> ids) {
     String str = "";
 
-    for (int i = 0 ; i < ids.length ; i++){
+    for (int i = 0; i < ids.length; i++) {
       str += ids[i].toString();
-      if(ids.length-1 != i){
+      if (ids.length - 1 != i) {
         str += " , ";
       }
     }
@@ -217,10 +221,13 @@ class DatabaseHelper {
 
   Future<List> getAllSiirlerByIDs(List<int> ids) async {
     var dbClient = await db;
-    var result = await dbClient.rawQuery('select siirler.id , $columnIsFavorite, $columnTitle , $columnSairID , $columnContent , $columnName , $columnSlug ' +
-        ' from siirler ' +
-        'left join sairler on sairler.id = siirler.sair_id ' +
-        'where siirler.id in ( ' + getIDSString(ids) + ' ) order by $columnTitle');
+    var result = await dbClient.rawQuery(
+        'select siirler.id , $columnIsFavorite, $columnTitle , $columnSairID , $columnContent , $columnName , $columnSlug ' +
+            ' from siirler ' +
+            'left join sairler on sairler.id = siirler.sair_id ' +
+            'where siirler.id in ( ' +
+            getIDSString(ids) +
+            ' ) order by $columnTitle');
 
     return result;
   }
@@ -253,10 +260,10 @@ class DatabaseHelper {
 
   Future<int> updateFavorite(int siirID) async {
     var dbClient = await db;
-    return await dbClient.rawUpdate('update $tableSiirler set $columnIsFavorite = ' +
-      'case $columnIsFavorite when 1 then 0 else 1 end where $columnId = ?',
-      [siirID]
-    );
+    return await dbClient.rawUpdate(
+        'update $tableSiirler set $columnIsFavorite = ' +
+            'case $columnIsFavorite when 1 then 0 else 1 end where $columnId = ?',
+        [siirID]);
   }
 
   Future<SairModel> getSair(int id) async {
@@ -292,11 +299,12 @@ class DatabaseHelper {
 
   Future<int> updateFavorites(List<String> lstFavorites) async {
     var dbClient = await db;
-    String inString = lstFavorites.toString().replaceAll('[', '(').replaceAll(']', ')');
+    String inString =
+        lstFavorites.toString().replaceAll('[', '(').replaceAll(']', ')');
 
-    return await dbClient.rawUpdate('update $tableSiirler set $columnIsFavorite = ' +
-        ' 1 where $columnId in $inString'
-    );
+    return await dbClient.rawUpdate(
+        'update $tableSiirler set $columnIsFavorite = ' +
+            ' 1 where $columnId in $inString');
   }
 
   Future<int> getIsFirstLogin() async {
@@ -305,21 +313,24 @@ class DatabaseHelper {
         await dbClient.rawQuery('SELECT isFirstLogin FROM $tableSettings'));
   }
 
-  Future<int> setIsFirstLogin(int value) async{
+  Future<int> setIsFirstLogin(int value) async {
     var dbClient = await db;
 
-    return await dbClient.rawUpdate('update $tableSettings set isFirstLogin = $value');
+    return await dbClient
+        .rawUpdate('update $tableSettings set isFirstLogin = $value');
   }
 
-  Future<int> setShowAds(int value) async{
+  Future<int> setShowAds(int value) async {
     var dbClient = await db;
 
-    return await dbClient.rawUpdate('update $tableSettings set $columnShowAds = $value');
+    return await dbClient
+        .rawUpdate('update $tableSettings set $columnShowAds = $value');
   }
 
-  Future<int> setSendDaily(int value) async{
+  Future<int> setSendDaily(int value) async {
     var dbClient = await db;
 
-    return await dbClient.rawUpdate('update $tableSettings set $columnSendDaily = $value');
+    return await dbClient
+        .rawUpdate('update $tableSettings set $columnSendDaily = $value');
   }
 }
