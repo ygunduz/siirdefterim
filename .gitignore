@@ -72,3 +72,5 @@ build/
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 assets/yedek.sqlite
 android/app/google-services.json
+
+firebase_functions/node_modules/
