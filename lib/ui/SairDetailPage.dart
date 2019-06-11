@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import '../model/SairModel.dart';
 import '../widget/SairBioWidget.dart';
 import '../widget/SiirList.dart';
+import '../model/State.dart';
+import '../StateWidget.dart';
 
 class SairDetailPage extends StatefulWidget {
   SairDetailPage({Key key, @required this.sair}) : super(key: key);
@@ -99,7 +101,21 @@ class _SairDetailPageState extends State<SairDetailPage>
             },
             body: TabBarView(children: _children, controller: _tabController),
           ),
+          bottomNavigationBar: _buildAdsContainer(context)
         ));
+  }
+
+  Widget _buildAdsContainer(BuildContext context){
+    StateModel appState = StateWidget.of(context).state;
+    if(appState.showAds){
+      return Container(
+        height: 50,
+        width: MediaQuery.of(context).size.width,
+      );
+    }
+    else{
+      return Container(width: 0,height: 0);
+    }
   }
 }
 

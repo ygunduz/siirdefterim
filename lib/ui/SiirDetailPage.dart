@@ -1,4 +1,3 @@
-import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:siirdefterim/StateWidget.dart';
 import 'package:siirdefterim/model/State.dart';
@@ -27,7 +26,7 @@ class _SiirDetailPageState extends State<SiirDetailPage> {
   List<ReadingTheme> themes = [
     ReadingTheme(Colors.orange[100], Colors.grey[800]),
     ReadingTheme(Colors.lightBlue[50], Colors.black),
-    ReadingTheme(Colors.black54, Colors.white),
+    ReadingTheme(Colors.grey[800], Colors.white),
     ReadingTheme(Colors.white, Colors.black),
   ];
 
@@ -38,12 +37,6 @@ class _SiirDetailPageState extends State<SiirDetailPage> {
   int _currentTheme = 0;
   int _fontSize = 16;
   int _currentPage = 0;
-
-  BannerAd _bannerAd = BannerAd(
-      size: AdSize.banner, 
-      //adUnitId: BannerAd.testAdUnitId
-      adUnitId: 'ca-app-pub-2668472791924496/5976151848'
-    );
 
   @override
   void initState() {
@@ -66,7 +59,6 @@ class _SiirDetailPageState extends State<SiirDetailPage> {
   @override
   void dispose() {
     super.dispose();
-    _bannerAd.dispose();
   }
 
   @override
@@ -74,6 +66,7 @@ class _SiirDetailPageState extends State<SiirDetailPage> {
     return Scaffold(
         backgroundColor: themes[_currentTheme].backgroundColor,
         appBar: AppBar(
+          elevation: 10.0,
           automaticallyImplyLeading: false,
           key: _scaffoldKey,
           backgroundColor: themes[_currentTheme].backgroundColor,
@@ -171,12 +164,6 @@ class _SiirDetailPageState extends State<SiirDetailPage> {
     StateModel appState = StateWidget.of(context).state;
     Size size = MediaQuery.of(context).size;
     if (appState.showAds) {
-      _bannerAd
-        ..load()
-        ..show(
-            anchorOffset: 0,
-            // Banner Position
-            anchorType: AnchorType.bottom);
       return SizedBox(
           height: 50,
           width: size.width,

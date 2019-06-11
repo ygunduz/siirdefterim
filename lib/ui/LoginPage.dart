@@ -64,7 +64,8 @@ class _LoginPageState extends State<LoginPage> {
           return AlertDialog(
           title: new Text("Bizi desteklemek istemez misiniz?"),
           content: new Text("Uygulamamızda reklamlar rahatsızlık vermeyecek düzeydedir." + 
-              "Yine de reklamları kapatmak istiyor musunuz?"),
+              " Yine de reklamları kapatmak istiyor musunuz? Reklamları kaldırdığınızda uygulamayı "
+              + "yeniden başlatmanız gerekir."),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             new FlatButton(

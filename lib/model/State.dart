@@ -11,7 +11,7 @@ class StateModel{
     this.isLoading = false,
     this.user,
     this.isLoggedIn = false,
-    this.showAds = true,
+    this.showAds = false,
     this.sendDaily = true
   });
 }

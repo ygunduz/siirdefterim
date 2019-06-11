@@ -1,8 +1,11 @@
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
+import '../StateWidget.dart';
 import '../widget/GridListWidget.dart';
 import '../util/DBHelper.dart';
 import '../model/SiirModel.dart';
 import '../model/SairModel.dart';
+import '../model/State.dart';
 import 'SairDetailPage.dart';
 import 'SiirDetailPage.dart';
 import 'FavoritesPage.dart';
@@ -23,9 +26,16 @@ class _HomePageState extends State<HomePage> {
 
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
+  BannerAd _bannerAd = BannerAd(
+      size: AdSize.banner,
+      //adUnitId: BannerAd.testAdUnitId
+      adUnitId: 'ca-app-pub-2668472791924496/5976151848'
+  );
+
   @override
   void dispose(){
     super.dispose();
+    _bannerAd.dispose();
   }
 
   @override
@@ -85,6 +95,11 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    StateModel appState =  StateWidget.of(context).state;
+    if(appState.showAds){
+      _bannerAd..load()..show();
+    }
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -106,49 +121,56 @@ class _HomePageState extends State<HomePage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.shuffle),
-        onPressed: () {
-          _db.getRandom(50).then((result) {
-            SiirModel siirModel = SiirModel.fromMap(result[0]);
-            SairModel sairModel = SairModel.fromMap(result[0]);
-
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => SiirDetailPage(siirModel, sairModel ,0, result)),
-            );
-          });
-        },
+        onPressed: _loadRandromSiirler,
       ),
       bottomNavigationBar: BottomAppBar(
         shape: CircularNotchedRectangle(),
         notchMargin: 4.0,
         color: Colors.grey,
-        child: new Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () async {
-                await showSearch<String>(
-                  context: context,
-                  delegate: _delegate,
-                );
-              },
-            ),
-            IconButton(
-              icon: Icon(Icons.star_border),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => FavoritesPage()),
-                );
-              },
-            )
-          ],
-        ),
+        child: Container(
+          height: appState.showAds ? 90 : 50,
+          width: MediaQuery.of(context).size.width,
+          child: new Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              IconButton(
+                icon: Icon(Icons.search),
+                onPressed: () async {
+                  await showSearch<String>(
+                    context: context,
+                    delegate: _delegate,
+                  );
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.star_border),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => FavoritesPage()),
+                  );
+                },
+              )
+            ],
+          ),
+        )
       ),
     );
+  }
+
+  void _loadRandromSiirler(){
+    _db.getRandom(50).then((result) {
+      SiirModel siirModel = SiirModel.fromMap(result[0]);
+      SairModel sairModel = SairModel.fromMap(result[0]);
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => SiirDetailPage(siirModel, sairModel ,0, result)),
+      );
+    });
   }
 }
 
@@ -208,7 +230,21 @@ class _SearchViewDelegate extends SearchDelegate<String> {
               List<Map<String, dynamic>> siirList = snapshot.data[1];
               List<Map<String, dynamic>> sairList = snapshot.data[0];
 
-              return buildSairSearchResult(sairList, siirList);
+              StateModel appState = StateWidget.of(context).state;
+              if(!appState.showAds){
+                return buildSairSearchResult(sairList, siirList);
+              }else{
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(
+                      child: buildSairSearchResult(sairList, siirList)
+                    ),
+                    Container(height: 50,width: 50)
+                  ],
+                );
+              }
             }
         }
       },
