@@ -1,16 +1,14 @@
-# siirdefterim
+# Şiir Defterim
 
 Şiir Defterim Mobil Uygulaması
 
-## Getting Started
+[<img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png"
+      alt="Download from Google Play"
+      height="80">](https://play.google.com/store/apps/details?id=com.ygunduz.siirdefterim)
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.io/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.io/docs/cookbook)
-
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.io/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+## Ekran Görüntüleri
+<img src="screenshots/1.png" alt="Ekran Görüntütü 1" width="300px">
+<img src="screenshots/2.png" alt="Ekran Görüntütü 2" width="300px">
+<img src="screenshots/3.png" alt="Ekran Görüntütü 3" width="300px">
+<img src="screenshots/4.png" alt="Ekran Görüntütü 4" width="300px">
+<img src="screenshots/5.png" alt="Ekran Görüntütü 5" width="300px">
